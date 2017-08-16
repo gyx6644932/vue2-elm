@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import routes from './router/router'
-import store from './store/'
+import store from './store/index'
 import {routerMode} from './config/env'
 import './config/rem'
 import FastClick from 'fastclick'
@@ -32,5 +32,9 @@ const router = new VueRouter({
 new Vue({
 	router,
 	store,
+  // 组件创建前，进行异步数据数据请求
+  beforeCreate() {
+    this.$store.dispatch('getAllData', this)
+  }
 }).$mount('#app')
 

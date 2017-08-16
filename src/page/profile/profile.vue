@@ -45,6 +45,22 @@
                 </ul>
             </section>
             <section class="profile-1reTe">
+                <!-- 聊天室 -->
+                <router-link to='/message' class="myorder">
+                    <aside>
+                        <svg fill="#ffc636">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vip"></use>
+                        </svg>
+                    </aside>
+                    <div class="myorder-div">
+                        <span>聊天室</span>
+                        <span class="myorder-divsvg">
+                            <svg fill="#bbb">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#arrow-right"></use>
+                            </svg>
+                        </span>
+                    </div>
+                </router-link>
                 <!-- 我的订单 -->
                 <router-link to='/order' class="myorder">
                     <aside>
