@@ -1,6 +1,6 @@
 <template>
   <div>
-  <div class=""></div>
+  <div class="header"></div>
   <transition :name="transitionName">
     <router-view class="child-view"></router-view>
   </transition>
@@ -42,5 +42,11 @@
     opacity: 0;
     -webkit-transform: translate(-50px, 0);
     transform: translate(-50px, 0);
+  }
+  .header {
+    position:absolute;
+    height:44px;
+    background:#0058f1;
+    width:100%
   }
 </style>

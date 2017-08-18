@@ -1,9 +1,7 @@
 <template>
 	<div>
-		<transition  :name="transitionName"> >
-			<keep-alive>
-			    <router-view class="child-view" v-if="$route.meta.keepAlive"></router-view>
-			</keep-alive>
+		<transition  :name="transitionName"  :mode="transitionMode">
+			    <router-view class="child-view" ></router-view>
     	</transition>
 		<svg-icon></svg-icon>	
     </div>
@@ -14,8 +12,21 @@
   	export default {
 	    data () {
 	      return {
-	        transitionName: 'slide-left'
+	        transitionName: 'slide-left',
+	        transitionMode: 'out-in'
 	      }
+	    },
+	    beforeRouteUpdate (to, from, next) {
+	      let isBack = this.$router.isBack
+	      if (isBack) {
+	        this.transitionName = 'slide-right',
+	        this.transitionMode = 'in-out'
+	      } else {
+	        this.transitionName = 'slide-left',
+	        this.transitionMode ='out-in'
+	      }
+	      this.$router.isBack = false
+	      next()
 	    },
     	components:{
             svgIcon
@@ -27,7 +38,7 @@
 <style lang="scss">
   	@import './style/common';
   .child-view {
-  transition: all .8s cubic-bezier(.55,0,.1,1);
+  transition: all .3s cubic-bezier(.55,0,.1,1);
   }
   .slide-left-enter, .slide-right-leave-active {
     opacity: 0;

@@ -52,7 +52,6 @@ const message = r => require.ensure([], () => r(require('../page/message/message
 
 Router.prototype.goBack = function () {
   this.isBack = true
-  console.log
   window.history.go(-1)
 }
 Vue.use(Router)
