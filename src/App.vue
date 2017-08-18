@@ -1,13 +1,10 @@
 <template>
 	<div>
-		<transition name="router-fade" mode="out-in">
+		<transition  :name="transitionName"> >
 			<keep-alive>
-			    <router-view v-if="$route.meta.keepAlive"></router-view>
+			    <router-view class="child-view" v-if="$route.meta.keepAlive"></router-view>
 			</keep-alive>
     	</transition>
-    	<transition name="router-fade" mode="out-in">
-			<router-view v-if="!$route.meta.keepAlive"></router-view>
-		</transition>
 		<svg-icon></svg-icon>	
     </div>
 </template>
@@ -15,6 +12,11 @@
 <script>
 	import svgIcon from './components/common/svg';
   	export default {
+	    data () {
+	      return {
+	        transitionName: 'slide-left'
+	      }
+	    },
     	components:{
             svgIcon
         },
@@ -24,10 +26,17 @@
 
 <style lang="scss">
   	@import './style/common';
-	.router-fade-enter-active, .router-fade-leave-active {
-	  	transition: opacity .3s;
-	}
-	.router-fade-enter, .router-fade-leave-active {
-	  	opacity: 0;
-	}
+  .child-view {
+  transition: all .8s cubic-bezier(.55,0,.1,1);
+  }
+  .slide-left-enter, .slide-right-leave-active {
+    opacity: 0;
+    -webkit-transform: translate(50px, 0);
+    transform: translate(50px, 0);
+  }
+  .slide-left-leave-active, .slide-right-enter {
+    opacity: 0;
+    -webkit-transform: translate(-50px, 0);
+    transform: translate(-50px, 0);
+  }
 </style>

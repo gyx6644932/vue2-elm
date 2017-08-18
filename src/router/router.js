@@ -1,4 +1,7 @@
+import Vue from 'vue'
+import Router from 'vue-router'
 import App from '../App'
+import PageTransition from '../components/common/PageTransition'
 
 const home = r => require.ensure([], () => r(require('../page/home/home')), 'home')
 const city = r => require.ensure([], () => r(require('../page/city/city')), 'city')
@@ -47,11 +50,18 @@ const find = r => require.ensure([], () => r(require('../page/find/find')), 'fin
 const download = r => require.ensure([], () => r(require('../page/download/download')), 'download')
 const message = r => require.ensure([], () => r(require('../page/message/message')), 'message')
 
-
+Router.prototype.goBack = function () {
+  this.isBack = true
+  console.log
+  window.history.go(-1)
+}
+Vue.use(Router)
 
 export default [{
     path: '/',
-    component: App, //顶层路由，对应index.html
+    name: 'PageTransition',
+    component: App,
+    //component: App, //顶层路由，对应index.html
     children: [ //二级路由。对应App.vue
         //地址为空时跳转home页面
         {
@@ -77,7 +87,9 @@ export default [{
         {
             path: '/msite',
             component: msite,
-            meta: { keepAlive: true },
+            meta: {
+                keepAlive: true
+            },
         },
         //特色商铺列表页
         {
@@ -148,25 +160,23 @@ export default [{
                 component: info,
                 children: [{
                     path: 'address',
-                    component: address,     //编辑地址
-                    children:[{
-                        path:'add',
-                        component:add,
-                        children:[{
-                            path:'addDetail',
-                            component:addDetail
+                    component: address, //编辑地址
+                    children: [{
+                        path: 'add',
+                        component: add,
+                        children: [{
+                            path: 'addDetail',
+                            component: addDetail
                         }]
                     }]
                 }]
-            },
-            {
+            }, {
                 path: 'setusername',
                 component: setusername,
-            },
-            {
+            }, {
                 path: 'service', //服务中心
                 component: service,
-            },]
+            }, ]
         },
         //修改密码页
         {
@@ -195,7 +205,7 @@ export default [{
             }, {
                 path: 'vipDescription', //会员说明
                 component: vipDescription,
-            },]
+            }, ]
         },
         //发现页
         {
@@ -211,7 +221,7 @@ export default [{
         {
             path: '/service',
             component: service,
-             children: [{
+            children: [{
                 path: 'questionDetail', //订单详情页
                 component: questionDetail,
             }, ]
@@ -244,7 +254,7 @@ export default [{
             }, {
                 path: 'commend', //推荐有奖
                 component: commend,
-            },]
+            }, ]
         },
         //我的积分页
         {
@@ -257,3 +267,4 @@ export default [{
         },
     ]
 }]
+

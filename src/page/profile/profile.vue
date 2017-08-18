@@ -1,6 +1,6 @@
 <template>
     <div class="profile_page">
-        <head-top go-back='true' :head-title="profiletitle"></head-top>
+        <head-top go-back='true' :head-title="profiletitle" @click="goback"></head-top>
         <section>
             <section class="profile-number">
                 <router-link :to="userInfo&&userInfo.user_id? '/profile/info' : '/login'" class="profile-link">
@@ -179,7 +179,7 @@ export default {
     mixins: [getImgPath],
     components:{
         headTop,
-        footGuide,
+        footGuide
     },
 
     computed:{
@@ -216,6 +216,9 @@ export default {
                 this.mobile = '暂无绑定手机号';
             }
         },
+    goback () {
+      this.$router.goBack()
+    }
     },
     watch: {
         userInfo: function (value){

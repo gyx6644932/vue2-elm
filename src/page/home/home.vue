@@ -1,186 +1,197 @@
 <template>
-  	<div>
-        <head-top signin-up='home'>
-            <span slot='logo' class="head_logo"  @click="reload">ele.me</span>
-        </head-top>
-        <nav class="city_nav">
-            <div class="city_tip">
-                <span>当前定位城市：</span>
-                <span>定位不准时，请在城市列表中选择</span>
-            </div>
-            <router-link :to="'/city/' + guessCityid" class="guess_city">
-                <span>{{guessCity}}</span>
-                <svg class="arrow_right">
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#arrow-right"></use>
+    <div>
+        <head-top signin-up='msite'>
+            <router-link :to="'/search/' + geohash" class="link_search" slot="search">
+                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" version="1.1">
+                    <circle cx="8" cy="8" r="7" stroke="rgb(255,255,255)" stroke-width="1" fill="none"/>
+                    <line x1="14" y1="14" x2="20" y2="20" style="stroke:rgb(255,255,255);stroke-width:2"/>
                 </svg>
-            </router-link>  
+            </router-link>
+            <router-link to="/home" slot="msite-title" class="msite_title">
+                <span class="title_text ellipsis">{{msietTitle}}</span>
+            </router-link>
+        </head-top>
+        <nav class="msite_nav">
+            <div class="swiper-container" v-if="foodTypes.length">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide food_types_container" v-for="(item, index) in foodTypes" :key="index">
+                        <router-link :to="{path: '/food', query: {geohash, title: foodItem.title, restaurant_category_id: getCategoryId(foodItem.link)}}" v-for="foodItem in item" :key="foodItem.id" class="link_to_food">
+                            <figure>
+                                <img :src="imgBaseUrl + foodItem.image_url">
+                                <figcaption>{{foodItem.title}}</figcaption>
+                            </figure>
+                        </router-link>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+            <img src="../../images/fl.svg" class="fl_back animation_opactiy" v-else>
         </nav>
-        <section id="hot_city_container">
-            <h4 class="city_title">热门城市</h4>
-            <ul class="citylistul clear">
-                <router-link  tag="li" v-for="item in hotcity" :to="'/city/' + item.id" :key="item.id">
-                    {{item.name}}
-                </router-link>  
-            </ul>
-        </section>
-        <section class="group_city_container">
-            <ul class="letter_classify">
-                <li v-for="(value, key, index) in sortgroupcity" :key="key"  class="letter_classify_li">
-                    <h4 class="city_title">{{key}}
-                        <span v-if="index == 0">（按字母排序）</span>
-                    </h4>
-                    <ul class="groupcity_name_container citylistul clear">
-                        <router-link  tag="li" v-for="item in value" :to="'/city/' + item.id" :key="item.id" class="ellipsis">
-                            {{item.name}}
-
-                        </router-link>  
-                    </ul>
-                </li>
-            </ul>
-        </section>
-    </div>
+        <div class="shop_list_container">
+            <header class="shop_header">
+                <svg class="shop_icon">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#shop"></use>
+                </svg>
+                <span class="shop_header_title">附近商家</span>
+            </header>
+            <shop-list geohash="geohash"></shop-list>
+        </div>
+        <foot-guide></foot-guide>
+    </div>    
 </template>
 
 <script>
-import headTop from '../../components/header/head'
-import {cityGuess, hotcity, groupcity} from '../../service/getData'
+import {mapMutations} from 'vuex'
+// import {imgBaseUrl} from 'src/config/env'
+import headTop from 'src/components/header/head'
+import footGuide from 'src/components/footer/footGuide'
+import shopList from 'src/components/common/shoplist'
+import {msiteAdress, msiteFoodTypes, cityGuess} from 'src/service/getData'
+import 'src/plugins/swiper.min.js'
+import 'src/style/swiper.min.css'
 
 export default {
     data(){
-        return{
-            guessCity: '',   //当前城市
-            guessCityid: '', //当前城市id
-            hotcity: [],     //热门城市列表
-            groupcity: {},   //所有城市列表
+        return {
+            geohash: '', // city页面传递过来的地址geohash
+            msietTitle: '请选择地址...', // msiet页面头部标题
+            foodTypes: [], // 食品分类列表
+            //hasGetData: false, //是否已经获取地理位置数据，成功之后再获取商铺列表信息
+            imgBaseUrl: 'https://fuss10.elemecdn.com', //图片域名地址
         }
     },
+    async beforeMount(){
+/*        if (!this.$route.query.geohash) {
+            const address = await cityGuess();
+            this.geohash = address.latitude + ',' + address.longitude;
+        }else{
+            this.geohash = this.$route.query.geohash
+        }
+        //保存geohash 到vuex
+        this.SAVE_GEOHASH(this.geohash);
+        //获取位置信息
+        let res = await msiteAdress(this.geohash);
+        this.msietTitle = res.name;
+        // 记录当前经度纬度
+        this.RECORD_ADDRESS(res);
 
-	mounted(){
-        // 获取当前城市
-        cityGuess().then(res => {
-            this.guessCity = res.name;
-            this.guessCityid = res.id;
-        })
-
-        //获取热门城市
-        hotcity().then(res => {
-            this.hotcity = res;
-        })
-
-        //获取所有城市
-        groupcity().then(res => {
-            this.groupcity = res;
-        })
+        this.hasGetData = true;*/
     },
-
-    components:{
-        headTop
-    },
-
-    computed:{
-        //将获取的数据按照A-Z字母开头排序
-        sortgroupcity(){
-            let sortobj = {};
-            for (let i = 65; i <= 90; i++) {
-                if (this.groupcity[String.fromCharCode(i)]) {
-                    sortobj[String.fromCharCode(i)] = this.groupcity[String.fromCharCode(i)];
-                }
+    mounted(){
+        //获取导航食品类型列表
+        msiteFoodTypes(this.geohash).then(res => {
+            let resLength = res.length;
+            let resArr = [...res]; // 返回一个新的数组
+            let foodArr = [];
+            for (let i = 0, j = 0; i < resLength; i += 8, j++) {
+                foodArr[j] = resArr.splice(0, 8);
             }
-            return sortobj
-        }
+            this.foodTypes = foodArr;
+        }).then(() => {
+            //初始化swiper
+            new Swiper('.swiper-container', {
+                pagination: '.swiper-pagination',
+                loop: true
+            });
+        })
     },
+    components: {
+        headTop,
+        shopList,
+        footGuide,
+    },
+    computed: {
 
-    methods:{
-        //点击图标刷新页面
-        reload(){
-            window.location.reload();
+    },
+    methods: {
+        ...mapMutations([
+            'RECORD_ADDRESS', 'SAVE_GEOHASH'
+        ]),
+        // 解码url地址，求去restaurant_category_id值
+        getCategoryId(url){
+            let urlData = decodeURIComponent(url.split('=')[1].replace('&target_name',''));
+            if (/restaurant_category_id/gi.test(urlData)) {
+                return JSON.parse(urlData).restaurant_category_id.id
+            }else{
+                return ''
+            }
         }
     },
+    watch: {
+
+    }
 }
 
 </script>
 
 <style lang="scss" scoped>
-    @import '../../style/mixin';
-    .head_logo{
-        left: 0.4rem;
-        font-weight: 400;
-        @include sc(0.7rem, #fff);
-        @include wh(2.3rem, 0.7rem);
+    @import 'src/style/mixin';
+    .link_search{
+        left: .8rem;
+        @include wh(.9rem, .9rem);
         @include ct;
     }
-    .city_nav{
-        padding-top: 2.35rem;
-        border-top: 1px solid $bc;
-        background-color: #fff;
-        margin-bottom: 0.4rem;
-        .city_tip{
-            @include fj;
-            line-height: 1.45rem;
-            padding: 0 0.45rem;
-            span:nth-of-type(1){
-                @include sc(0.55rem, #666);
-            }
-            span:nth-of-type(2){
-                font-weight: 900;
-                @include sc(0.475rem, #9f9f9f);
-            }
-
-        }
-        .guess_city{
-            @include fj;
-            align-items: center;
-            height: 1.8rem;
-            padding: 0 0.45rem;
-            border-top: 1px solid $bc;
-            border-bottom: 2px solid $bc;
-            @include font(0.75rem, 1.8rem);
-            span:nth-of-type(1){
-                color: $blue;
-            }
-            .arrow_right{
-                @include wh(.6rem, .6rem);
-                fill: #999;
-            }
-        }
-    }
-    #hot_city_container{
-        background-color: #fff;
-        margin-bottom: 0.4rem;
-    }
-    .citylistul{
-        li{
-            float: left;
+    .msite_title{
+        @include center;
+        width: 50%;
+        color: #fff;
+        text-align: center;
+        margin-left: -0.5rem;
+        .title_text{
+            @include sc(0.8rem, #fff);
             text-align: center;
-            color: $blue;
-            border-bottom: 0.025rem solid $bc;
-            border-right: 0.025rem solid $bc;
-            @include wh(25%, 1.75rem);
-            @include font(0.6rem, 1.75rem);
-        }
-        li:nth-of-type(4n){
-            border-right: none;
+            display: block;
         }
     }
-    .city_title{
-        color: #666;
-        font-weight: 400;
-        text-indent: 0.45rem;
-        border-top: 2px solid $bc;
-        border-bottom: 1px solid $bc;
-        @include font(0.55rem, 1.45rem, "Helvetica Neue");
-        span{
-            @include sc(0.475rem, #999);
-        }
-    }
-    
-    .letter_classify_li{
-        margin-bottom: 0.4rem;
+    .msite_nav{
+        padding-top: 2.1rem;
         background-color: #fff;
-        border-bottom: 1px solid $bc;
-        .groupcity_name_container{
-            li{
-                color: #666;
+        border-bottom: 0.025rem solid $bc;
+        height: 10.6rem;
+        .swiper-container{
+            @include wh(100%, auto);
+            padding-bottom: 0.6rem;
+            .swiper-pagination{
+                bottom: 0.2rem;
+            }
+        }
+        .fl_back{
+            @include wh(100%, 100%);
+        }
+    }
+    .food_types_container{
+        display:flex;
+        flex-wrap: wrap;
+        .link_to_food{
+            width: 25%;
+            padding: 0.3rem 0rem;
+            @include fj(center);
+            figure{
+                img{
+                    margin-bottom: 0.3rem;
+                    @include wh(1.8rem, 1.8rem);
+                }
+                figcaption{
+                    text-align: center;
+                    @include sc(0.55rem, #666);
+                }
+            }
+        }
+    }
+    .shop_list_container{
+        margin-top: .4rem;
+        border-top: 0.025rem solid $bc;
+        background-color: #fff;
+        .shop_header{
+            .shop_icon{
+                fill: #999;
+                margin-left: 0.6rem;
+                vertical-align: middle;
+                @include wh(0.6rem, 0.6rem);
+            }
+            .shop_header_title{
+                color: #999;
+                @include font(0.55rem, 1.6rem);
             }
         }
     }

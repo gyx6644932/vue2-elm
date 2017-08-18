@@ -9,24 +9,32 @@ export const cityGuess = () => fetch('/v1/cities', {
 	type: 'guess'
 });
 
+export const weatherfe = () => fetch('http://localhost:3000/api/weather');
+
+export const hotcity = () => fetch('http://localhost:3000/api/cities', {
+	type: 'hot'
+});
+export const groupcity = () => fetch('http://localhost:3000/api/cities', {
+	type: 'group'
+});
 
 /**
  * 获取首页热门城市
  */
 
-export const hotcity = () => fetch('/v1/cities', {
+/*export const hotcity = () => fetch('/v1/cities', {
 	type: 'hot'
-});
+});*/
 
 
 /**
  * 获取首页所有城市
  */
 
-export const groupcity = () => fetch('/v1/cities', {
+/*export const groupcity = () => fetch('/v1/cities', {
 	type: 'group'
 });
-
+*/
 
 /**
  * 获取当前所在城市
@@ -68,7 +76,8 @@ export const msiteFoodTypes = geohash => fetch('/v2/index_entry', {
  * 获取msite商铺列表
  */
 
-export const shopList = (latitude, longitude, offset, restaurant_category_id = '', restaurant_category_ids = '', order_by = '', delivery_mode = '', support_ids = []) => {
+export const shopList = () => fetch('http://localhost:3000/api/restaurants');
+/*export const shopList = (latitude, longitude, offset, restaurant_category_id = '', restaurant_category_ids = '', order_by = '', delivery_mode = '', support_ids = []) => {
 	let supportStr = '';
 	support_ids.forEach(item => {
 		if (item.status) {
@@ -89,7 +98,7 @@ export const shopList = (latitude, longitude, offset, restaurant_category_id = '
 	};
 	return fetch('/shopping/restaurants', data);
 };
-
+*/
 
 /**
  * 获取search页面搜索结果

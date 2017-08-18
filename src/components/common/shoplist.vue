@@ -105,7 +105,7 @@ export default {
 	methods: {
 		async initData(){
 			//获取数据
-			let res = await shopList(this.latitude, this.longitude, this.offset, this.restaurantCategoryId);
+			let res = await shopList();
 			this.shopListArr = [...res];
 			if (res.length < 20) {
 				this.touchend = true;

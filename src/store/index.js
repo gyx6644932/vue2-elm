@@ -57,6 +57,7 @@ let state = {  // 对话框
   ],
 
 
+  weatherList: '', //是否已经获取地理位置数据，成功之后再获取商铺列表信息
 	latitude: '', // 当前位置纬度
 	longitude: '', // 当前位置经度
 	cartList: {}, // 加入购物车的商品列表
