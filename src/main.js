@@ -5,6 +5,10 @@ import store from './store/index'
 import {routerMode} from './config/env'
 import './config/rem'
 import FastClick from 'fastclick'
+import MuseUI from 'muse-ui'
+import 'muse-ui/dist/muse-ui.css'
+Vue.use(MuseUI)
+
 
 if ('addEventListener' in document) {
     document.addEventListener('DOMContentLoaded', function() {

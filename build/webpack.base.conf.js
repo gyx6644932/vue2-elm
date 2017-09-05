@@ -2,6 +2,7 @@ var path = require('path')
 var config = require('../config')
 var utils = require('./utils')
 var projectRoot = path.resolve(__dirname, '../')
+var vueLoaderConfig = require('./vue-loader.conf')
 
 var env = process.env.NODE_ENV
     // check env & config/index.js to decide weither to enable CSS Sourcemaps for the
@@ -9,6 +10,10 @@ var env = process.env.NODE_ENV
 var cssSourceMapDev = (env === 'development' && config.dev.cssSourceMap)
 var cssSourceMapProd = (env === 'production' && config.build.productionSourceMap)
 var useCssSourceMap = cssSourceMapDev || cssSourceMapProd
+
+function resolve(dir) {
+    return path.join(__dirname, '..', dir)
+}
 
 
 module.exports = {
@@ -24,10 +29,11 @@ module.exports = {
         extensions: ['', '.js', '.vue', '.less', '.css', '.scss'],
         fallback: [path.join(__dirname, '../node_modules')],
         alias: {
+            'muse-components': 'muse-ui/src', //npm包里面的组件引用
             'vue$': 'vue/dist/vue.common.js',
             'src': path.resolve(__dirname, '../src'),
             'assets': path.resolve(__dirname, '../src/assets'),
-            'components': path.resolve(__dirname, '../src/components')
+            'components': path.resolve(__dirname, '../src/components'),
         }
     },
     resolveLoader: {
@@ -37,6 +43,9 @@ module.exports = {
         loaders: [{
             test: /\.vue$/,
             loader: 'vue'
+        }, {
+            test: /muse-ui.src.*?js$/,
+            loader: 'babel'
         }, {
             test: /\.js$/,
             loader: 'babel',

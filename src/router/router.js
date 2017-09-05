@@ -49,6 +49,7 @@ const questionDetail = r => require.ensure([], () => r(require('../page/service/
 const find = r => require.ensure([], () => r(require('../page/find/find')), 'find')
 const download = r => require.ensure([], () => r(require('../page/download/download')), 'download')
 const message = r => require.ensure([], () => r(require('../page/message/message')), 'message')
+const weather = r => require.ensure([], () => r(require('../page/weather/weather')), 'weather')
 
 Router.prototype.goBack = function () {
   this.isBack = true
@@ -71,6 +72,11 @@ export default [{
         {
             path: '/message',
             component: message,
+        },
+        //天气预报
+        {
+            path: '/weather',
+            component: weather,
         },
         //首页城市列表页
         {

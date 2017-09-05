@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<transition  :name="transitionName"  :mode="transitionMode">
+		<transition  :name="transitionName" >
 			    <router-view class="child-view" ></router-view>
     	</transition>
 		<svg-icon></svg-icon>	
@@ -19,11 +19,9 @@
 	    beforeRouteUpdate (to, from, next) {
 	      let isBack = this.$router.isBack
 	      if (isBack) {
-	        this.transitionName = 'slide-right',
-	        this.transitionMode = 'in-out'
+	        this.transitionName = 'slide-right'
 	      } else {
-	        this.transitionName = 'slide-left',
-	        this.transitionMode ='out-in'
+	        this.transitionName = 'slide-left'
 	      }
 	      this.$router.isBack = false
 	      next()
@@ -33,7 +31,7 @@
         },
   	}
 
-</script>
+</script> 
 
 <style lang="scss">
   	@import './style/common';

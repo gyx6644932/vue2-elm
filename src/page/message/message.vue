@@ -1,196 +1,104 @@
 <template>
-  <div>
-    <section v-if="!showLoading">
-      <head-top signin-up='msite'>
-        <router-link :to="'/search/' + geohash" class="link_search" slot="search">
-          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" version="1.1">
-            <circle cx="8" cy="8" r="7" stroke="rgb(255,255,255)" stroke-width="1" fill="none" />
-            <line x1="14" y1="14" x2="20" y2="20" style="stroke:rgb(255,255,255);stroke-width:2" />
-          </svg>
-        </router-link>
-        <router-link to="/home" slot="msite-title" class="msite_title">
-          <span class="title_text ellipsis">{{msietTitle}}</span>
-        </router-link>
-      </head-top>
-      <div class="shop_list_container">
-        <header class="shop_header">
-          <svg class="shop_icon">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#shop"></use>
-          </svg>
-          <span class="shop_header_title">嘉兴最近天气</span>
-        </header>
-        <shop-list v-if="hasGetData" :geohash="geohash"></shop-list>
-      </div>
-      <div class="item">
-        <li v-for="(item,index) in weatherList.data.forecast" :key="index">
-          <span>{{item.date}}</span>
-          <span>{{item.high}}</span>
-          <span>{{item.low}}</span>
-        </li>
-      </div>
-      <foot-guide></foot-guide>
-    </section>
-    <section class="animation_opactiy shop_back_svg_container" v-if="showLoading">
-      <img src="../../images/shop_back_svg.svg">
-    </section>
-  </div>
+  <!--判定ajax结束后，且有消息列表存在才开始渲染组件，防止报错-->
+  <mu-list v-if="isAjax&&nowMessageList">
+    <!--设置列表删除时动态效果-->
+    <div v-for="(item, index) of nowMessageList" :class="[{swipeleft: isSwipe[index]},'wrap']" @click="getActiveId_x(item._id)" ref="child" :key="index">
+      <mu-list-item :title="item.friend.name" :describeLine="1" :disableRipple="true" class="list-item">
+        <!--头像-->
+        <mu-avatar :src="item.friend.avatar" slot="leftAvatar" />
+        <!--预览信息-->
+        <span slot="describe">
+                        <span style="color: rgba(0, 0, 0, .5)">{{item.list[item.list.length-1].message}}</span>
+        </span>
+        <!--时间与待处理-->
+        <div class="item-right" slot="right">
+          <!--获取到当前聊天队列，最后一条内容的time-->
+          <span class="time">{{item.list[item.list.length-1].time}}</span>
+          <!--数据条数-->
+          <!--数据需求是为字符串-->
+          <mu-badge :content="`${item.list.length-1}`" />
+        </div>
+      </mu-list-item>
+      <!--分割线-->
+      <!--阻止时间冒泡-->
+      <div class="delete" @click.stop="removeM(item._id)">删除</div>
+    </div>
+  </mu-list>
 </template>
 <script>
-import { mapMutations } from 'vuex'
-// import {imgBaseUrl} from 'src/config/env'
-import headTop from 'src/components/header/head'
-import footGuide from 'src/components/footer/footGuide'
-import shopList from 'src/components/common/shoplist'
-import { msiteAdress, msiteFoodTypes, cityGuess, weatherfe } from 'src/service/getData'
-import 'src/plugins/swiper.min.js'
-import 'src/style/swiper.min.css'
-
+import { mapState, mapGetters, mapMutations } from 'vuex'
+/*import {weatherfe} from 'src/vuex/actions'*/
+// 后续会将滑动封装至子组件
+// import swipeDelete from './swipeDelete'
 export default {
+  name: 'message',
   data() {
     return {
-      showLoading: true, //显示加载动画
-      geohash: '', // city页面传递过来的地址geohash
-      msietTitle: '请选择地址...', // msiet页面头部标题
-      foodTypes: [], // 食品分类列表
-      hasGetData: false, //是否已经获取地理位置数据，成功之后再获取商铺列表信息
-      weatherList: '', //是否已经获取地理位置数据，成功之后再获取商铺列表信息
-      imgBaseUrl: 'https://fuss10.elemecdn.com', //图片域名地址
+      isSwipe: [false, false, false]
     }
-  },
-  async beforeMount() {
-
-  },
-  mounted() {
-    this.initData();
-    //获取导航食品类型列表
-    msiteFoodTypes(this.geohash).then(res => {
-      let resLength = res.length;
-      let resArr = [...res]; // 返回一个新的数组
-      let foodArr = [];
-      for (let i = 0, j = 0; i < resLength; i += 8, j++) {
-        foodArr[j] = resArr.splice(0, 8);
-      }
-      this.foodTypes = foodArr;
-    }).then(() => {
-      //初始化swiper
-      new Swiper('.swiper-container', {
-        pagination: '.swiper-pagination',
-        loop: true
-      });
-    })
-  },
-  components: {
-    headTop,
-    shopList,
-    footGuide,
   },
   computed: {
-
+    ...mapGetters(['nowMessageList']),
+    // ajax是否已经结束
+    ...mapState(['isAjax'])
   },
   methods: {
-    ...mapMutations([
-      'RECORD_ADDRESS', 'SAVE_GEOHASH'
-    ]),
-    // 解码url地址，求去restaurant_category_id值
-    getCategoryId(url) {
-      let urlData = decodeURIComponent(url.split('=')[1].replace('&target_name', ''));
-      if (/restaurant_category_id/gi.test(urlData)) {
-        return JSON.parse(urlData).restaurant_category_id.id
-      } else {
-        return ''
-      }
+    ...mapMutations(['showDialog', 'getActiveId', 'zeroRemove', 'removeMessage']),
+    // 获取点击的friend的_id
+    getActiveId_x(id) {
+      this.getActiveId({ activeId: id })
+      this.showDialog()
     },
-    async initData() {
-      this.weatherList = await weatherfe();
-      //隐藏加载动画
-      this.hideLoading();
-
-    },
-    //隐藏动画
-    hideLoading() {
-      this.showLoading = false;
+    // 删除信息
+    removeM(_id) {
+      this.removeMessage({ _id })
     }
   },
-  watch: {
-
+  created() {
+    setTimeout(() => {
+      // 判断是否存在信息列表
+      if (this.$refs.child) {
+        this.$refs.child.forEach((element, index) => {
+          let x, y, X, Y, swipeX, swipeY
+          // 监听touchstart
+          element.addEventListener('touchstart', e => {
+            x = e.changedTouches[0].pageX
+            y = e.changedTouches[0].pageY
+            swipeX = true
+            swipeY = true
+            this.isSwipe = [false, false, false]
+          })
+          element.addEventListener('touchmove', e => {
+            X = event.changedTouches[0].pageX
+            Y = event.changedTouches[0].pageY
+            if (swipeX && Math.abs(X - x) - Math.abs(Y - y) > 0) {
+              // 阻止默认事件
+              e.stopPropagation()
+              // 右滑
+              if (X - x > 10) {
+                e.preventDefault()
+                this.isSwipe.splice(index, 1, false)
+              }
+              if (x - X > 10) {
+                e.preventDefault()
+                this.isSwipe.splice(index, 1, true)
+              }
+              swipeY = false
+            }
+            if (swipeY && Math.abs(X - x) - Math.abs(Y - y) < 0) {
+              swipeX = false
+            }
+          })
+        })
+      }
+    }, 1000)
   }
 }
 
 </script>
-<style lang="scss" scoped>
-@import 'src/style/mixin';
-.link_search {
-  left: .8rem;
-  @include wh(.9rem, .9rem);
-  @include ct;
-}
-
-.msite_title {
-  @include center;
-  width: 50%;
-  color: #fff;
-  text-align: center;
-  margin-left: -0.5rem;
-  .title_text {
-    @include sc(0.8rem, #fff);
-    text-align: center;
-    display: block;
-  }
-}
-
-.msite_nav {
-  padding-top: 2.1rem;
-  background-color: #fff;
-  border-bottom: 0.025rem solid $bc;
-  height: 10.6rem;
-  .swiper-container {
-    @include wh(100%, auto);
-    padding-bottom: 0.6rem;
-    .swiper-pagination {
-      bottom: 0.2rem;
-    }
-  }
-  .fl_back {
-    @include wh(100%, 100%);
-  }
-}
-
-.food_types_container {
-  display: flex;
-  flex-wrap: wrap;
-  .link_to_food {
-    width: 25%;
-    padding: 0.3rem 0rem;
-    @include fj(center);
-    figure {
-      img {
-        margin-bottom: 0.3rem;
-        @include wh(1.8rem, 1.8rem);
-      }
-      figcaption {
-        text-align: center;
-        @include sc(0.55rem, #666);
-      }
-    }
-  }
-}
-
-.shop_list_container {
-  margin-top: .4rem;
-  border-top: 0.025rem solid $bc;
-  background-color: #fff;
-  .shop_header {
-    .shop_icon {
-      fill: #999;
-      margin-left: 0.6rem;
-      vertical-align: middle;
-      @include wh(0.6rem, 0.6rem);
-    }
-    .shop_header_title {
-      color: #999;
-      @include font(0.55rem, 1.6rem);
-    }
-  }
-}
+<!-- <style lang="stylus">
+@import '../../style/stylus/mixin.styl' .mu-list overflow: hidden background: color-g // 左滑删除
+.swipeleft transform:translateX(-20%) .wrap width: 125% overflow: hidden transition:all 0.3s linear border-b-1px(rgba(0, 0, 0, .1)) .list-item float: left width:80% height: 10vh background: color-w transition:all 0.3s linear .delete float: right display: block height: 10vh line-height: 10vh width: 20% text-align: center font-size: 1.2em font-weight: 500 color: color-w background: #ff1744 .item-right position:relative .time display: inline-block position: absolute top: -10px left: -16px .mu-badge display: inline-block position: absolute top: 0 left: -10px border-radius: 5px
 
 </style>
+ -->
