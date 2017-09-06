@@ -3,7 +3,12 @@ import Router from 'vue-router'
 import App from '../App'
 import PageTransition from '../components/common/PageTransition'
 
-const home = r => require.ensure([], () => r(require('../page/home/home')), 'home')
+
+const message = r => require.ensure([], () => r(require('../page/message/message')), 'message')
+const friends = r => require.ensure([], () => r(require('../page/friends/friends')), 'friends')
+const discover = r => require.ensure([], () => r(require('../page/discover/discover')), 'discover')
+
+/*const home = r => require.ensure([], () => r(require('../page/home/home')), 'home')
 const city = r => require.ensure([], () => r(require('../page/city/city')), 'city')
 const msite = r => require.ensure([], () => r(require('../page/msite/msite')), 'msite')
 const search = r => require.ensure([], () => r(require('../page/search/search')), 'search')
@@ -49,7 +54,7 @@ const questionDetail = r => require.ensure([], () => r(require('../page/service/
 const find = r => require.ensure([], () => r(require('../page/find/find')), 'find')
 const download = r => require.ensure([], () => r(require('../page/download/download')), 'download')
 const message = r => require.ensure([], () => r(require('../page/message/message')), 'message')
-const weather = r => require.ensure([], () => r(require('../page/weather/weather')), 'weather')
+const weather = r => require.ensure([], () => r(require('../page/weather/weather')), 'weather')*/
 
 Router.prototype.goBack = function () {
   this.isBack = true
@@ -66,13 +71,21 @@ export default [{
         //地址为空时跳转home页面
         {
             path: '',
-            redirect: '/home'
+            redirect: '/message'
         },
         //聊天页
         {
+            path: '/friends',
+            component: friends,
+        },
+        {
+            path: '/discover',
+            component: discover,
+        },
+        {
             path: '/message',
             component: message,
-        },
+        }/*,
         //天气预报
         {
             path: '/weather',
@@ -269,7 +282,7 @@ export default [{
                 path: 'detail', //积分说明
                 component: pointsDetail,
             }, ]
-        },
+        },*/
     ]
 }]
 
