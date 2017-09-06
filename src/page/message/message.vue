@@ -107,7 +107,7 @@ export default {
 }
 </script>
 <style lang="stylus">
-@import '../../common/stylus/mixin.styl'
+@import '../../style/stylus/mixin.styl'
 .mu-list
   overflow: hidden
   background: color-g

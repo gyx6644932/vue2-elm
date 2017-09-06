@@ -9,15 +9,6 @@ export const cityGuess = () => fetch('/v1/cities', {
 	type: 'guess'
 });
 
-export const selfdata = () => fetch('http://localhost:3000/api/self');
-
-export const friendsdata = () => fetch('http://localhost:3000/api/friends');
-
-export const robotapidata = (message,id) => fetch('http://localhost:3000/api/robotapi', {
-	message: message,
-	id: id
-});
-
 export const weatherfe = () => fetch('http://localhost:3000/api/weather');
 
 export const hotcity = () => fetch('http://localhost:3000/api/cities', {
